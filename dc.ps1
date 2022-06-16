@@ -20,11 +20,12 @@ function dc(
     }
 
     $noWait = $Rest | ? { $_ -eq "--no-wait" }
+    $foreground = $Rest | ? {$_ -eq "--no-d" }
     $Rest = $Rest | ? { $_ -ne "--no-wait" }
 
     switch ($Command) {
         "up" {
-            docker compose up -d ($noWait ? "" : "--wait") $Rest
+            docker compose up ($foreground ? "" : "-d") ($noWait ? "" : "--wait") $Rest
         }
         "restart" {
             dc down $Rest
