@@ -24,45 +24,7 @@ function dc(
 
     switch ($Command) {
         "up" {
-            dc up-without-wait $Rest
-            if (!$noWait) {
-                dc wait $Rest
-            }
-        }
-        "up-without-wait" {
-            docker compose up -d $Rest
-        }
-        "wait" {
-            $progressReportInterval = 10
-            $waitedSeconds = 0
-            do {
-                $waitingFor = docker compose ps -a --format json | ConvertFrom-Json | ? { $_.State -notin @("running", "exited") -or $_.Health -notin @("", "healthy") }
-                if ($waitingFor) {
-                    if (!$waitedSeconds) {
-                        Write-Host "Waiting for these services to start and report healthy" -NoNewline
-                    }
-                    if ($waitedSeconds % $progressReportInterval -eq 0) {
-                        Write-Host
-                        $waitingFor | % {
-                            $health = $_.Health -ne "" ? " ($($_.Health))" : ""
-                            Write-Host "`t$($_.Name): $($_.State)$health"
-                        }
-                    }
-                    else {
-                        if ($waitedSeconds % $progressReportInterval -eq 1) {
-                            Write-Host "`t" -NoNewline
-                        }
-                        Write-Host "." -NoNewline
-                    }
-                    Start-Sleep -s 1
-                    $waitedSeconds++
-                }
-            }
-            while ($waitingFor)
-
-            if ($waitedSeconds) {
-                Write-Host
-            }
+            docker compose up -d ($noWait ? "" : "--wait") $Rest
         }
         "restart" {
             dc down $Rest
