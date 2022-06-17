@@ -19,17 +19,22 @@ function dc(
         Write-Output "Time spent starting Docker Desktop: $($startupTime.Elapsed)"
     }
 
+    $attach = $Rest | ? { $_ -eq "-a" }
     $noWait = $Rest | ? { $_ -eq "--no-wait" }
-    $foreground = $Rest | ? {$_ -eq "--no-d" }
-    $Rest = $Rest | ? { $_ -ne "--no-wait" }
+    $Rest = $Rest | ? { $_ -notin @("-a", "--no-wait") }
+
+    if ($attach -and $noWait) {
+        Write-Error "$attach and $noWait are conflicting arguments"
+        return
+    }
 
     switch ($Command) {
         "up" {
-            docker compose up ($foreground ? "" : "-d") ($noWait ? "" : "--wait") $Rest
+            docker compose up ($attach ? "" : "-d") ($noWait -or $attach ? "" : "--wait") $Rest
         }
         "restart" {
             dc down $Rest
-            dc up $noWait $Rest
+            dc up $attach $noWait $Rest
         }
         default {
             docker compose $Command $Rest
