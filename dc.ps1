@@ -4,19 +4,19 @@ function dc(
 
     $totalTime = [System.Diagnostics.Stopwatch]::StartNew()
 
-    if (!(Get-Process "Docker Desktop" -ErrorAction Ignore)) {
+    if (!(Get-Process "Rancher Desktop" -ErrorAction Ignore)) {
         if ($Command -eq "down") {
-            Write-Output "Docker is not running"
+            Write-Output "Rancher Desktop is not running"
             return
         }
         $startupTime = [System.Diagnostics.Stopwatch]::StartNew()
-        . "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
+        explorer "$env:LocalAppData\Programs\Rancher Desktop\Rancher Desktop.exe"
         while ((docker ps *>&1) -ilike "*error*") {
-            Write-Output "Waiting for Docker Desktop to start"
+            Write-Output "Waiting for Rancher Desktop to start"
             Start-Sleep -s 1
         }
         $startupTime.Stop()
-        Write-Output "Time spent starting Docker Desktop: $($startupTime.Elapsed)"
+        Write-Output "Time spent starting Rancher Desktop: $($startupTime.Elapsed)"
     }
 
     $attach = $Rest | ? { $_ -eq "-a" }
