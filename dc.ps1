@@ -11,10 +11,12 @@ function dc(
         }
         $startupTime = [System.Diagnostics.Stopwatch]::StartNew()
         . "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
+        Write-Host "Waiting for Docker Desktop to start" -NoNewline
         while ((docker ps *>&1) -ilike "*error*") {
-            Write-Output "Waiting for Docker Desktop to start"
+            Write-Host "." -NoNewline
             Start-Sleep -s 1
         }
+        Write-Host
         $startupTime.Stop()
         Write-Output "Time spent starting Docker Desktop: $($startupTime.Elapsed)"
     }
