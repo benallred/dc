@@ -32,7 +32,7 @@ function dc(
         "up" {
             docker compose up ($attach ? "" : "-d") ($noWait -or $attach ? "" : "--wait") $Rest
         }
-        "restart" {
+        "reup" {
             dc down $Rest
             dc up $attach $noWait $Rest
         }
